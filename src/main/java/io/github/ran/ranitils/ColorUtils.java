@@ -25,7 +25,7 @@ public class ColorUtils {
     private static final Map<Color, String> colorToMinecraftResourceLocation = new HashMap<>();
 
     /**
-     * Gets the color of a pixel in an image.
+     * Gets the average color of the image.
      * @param inputStream The input stream of the image.
      * @return The average color of the image.
      * @throws IOException If the image fails to be read.
