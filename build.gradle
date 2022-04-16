@@ -1,0 +1,14 @@
+plugins {
+    id 'java'
+}
+
+group 'io.github.ran.ranitils'
+version '1.0-UwU'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.diogonunes:JColor:5.3.1'
+}
