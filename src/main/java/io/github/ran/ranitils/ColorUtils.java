@@ -12,6 +12,9 @@ import com.diogonunes.jcolor.Attribute;
 import com.sun.jna.Function;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.platform.win32.WinNT;
+import net.kyori.adventure.text.minimessage.MiniMessage;
+import net.kyori.adventure.text.minimessage.ParsingException;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
@@ -148,6 +151,16 @@ public class ColorUtils {
         }
 
         /**
+         * Replaces minecraft color codes with ansi codes.
+         * @param mcText The text to color.
+         * @param legacy Set this to true if you're using a version of Minecraft that doesn't support RGB color codes.
+         * @return String that's colored with ansi codes.
+         */
+        public static String minecraftColorToAnsi(String mcText, boolean legacy) {
+            return legacy ? Colors.colorizeLegacy(mcText) : Colors.colorize(mcText);
+        }
+
+        /**
          * Check if the text contains color codes.
          * @param mcText The text to check for color codes.
          */
@@ -222,6 +235,13 @@ public class ColorUtils {
             }
 
             public static String colorize(String mcText) {
+                boolean tryAgain = false;
+                try {
+                    mcText = LegacyComponentSerializer.builder().hexColors().useUnusualXRepeatedCharacterHexFormat().build().serialize(MiniMessage.builder().build().deserialize(mcText));
+                } catch (ParsingException e) {
+                    tryAgain = true;
+                }
+
                 String[] magicCodes = Pattern.compile("(?i)" + '\u00A7' +"x[A-F0-9" + '\u00A7' +"]{12}").matcher(mcText).results().map(MatchResult::group).toArray(String[]::new);
                 for (String magicCode : magicCodes) {
                     Color color = Color.decode("#" + magicCode.substring(2).replaceAll("\u00A7", ""));
@@ -232,7 +252,28 @@ public class ColorUtils {
                 for (String match : matches) {
                     mcText = mcText.replaceAll(Pattern.quote(match), Matcher.quoteReplacement(Ansi.generateCode(Colors.getColor(match).getAttribute())));
                 }
-                return mcText + Ansi.generateCode(Attribute.CLEAR());
+                return (tryAgain ? colorize(mcText) : mcText) + Ansi.generateCode(Attribute.CLEAR());
+            }
+
+            public static String colorizeLegacy(String mcText) {
+                boolean tryAgain = false;
+                try {
+                    mcText = LegacyComponentSerializer.builder().build().serialize(MiniMessage.builder().build().deserialize(mcText));
+                } catch (ParsingException e) {
+                    tryAgain = true;
+                }
+
+                String[] magicCodes = Pattern.compile("(?i)" + '\u00A7' +"x[A-F0-9" + '\u00A7' +"]{12}").matcher(mcText).results().map(MatchResult::group).toArray(String[]::new);
+                for (String magicCode : magicCodes) {
+                    Color color = Color.decode("#" + magicCode.substring(2).replaceAll("\u00A7", ""));
+                    mcText = mcText.replaceAll(Pattern.quote(magicCode), Matcher.quoteReplacement(Ansi.generateCode(Attribute.TEXT_COLOR(color.getRed(), color.getGreen(), color.getBlue()))));
+                }
+
+                String[] matches = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]").matcher(mcText).results().map(MatchResult::group).toArray(String[]::new);
+                for (String match : matches) {
+                    mcText = mcText.replaceAll(Pattern.quote(match), Matcher.quoteReplacement(Ansi.generateCode(Colors.getColor(match).getAttribute())));
+                }
+                return (tryAgain ? colorizeLegacy(mcText) : mcText) + Ansi.generateCode(Attribute.CLEAR());
             }
         }
     }
