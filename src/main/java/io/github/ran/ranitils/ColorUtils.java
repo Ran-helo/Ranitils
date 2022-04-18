@@ -165,7 +165,7 @@ public class ColorUtils {
          * @param mcText The text to check for color codes.
          */
         public static boolean containsMinecraftColorCodes(String mcText) {
-            return Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]").matcher(mcText).results().findAny().isPresent();
+            return Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]").matcher(mcText).find();
         }
 
         private enum Colors {
@@ -207,31 +207,54 @@ public class ColorUtils {
             public Attribute getAttribute() {
                 return attribute;
             }
+
             public static Colors getColor(String colorChar) {
-                return switch (colorChar) {
-                    case '\u00A7' + "0" -> Colors.BLACK;
-                    case '\u00A7' + "1" -> Colors.DARK_BLUE;
-                    case '\u00A7' + "2" -> Colors.DARK_GREEN;
-                    case '\u00A7' + "3" -> Colors.DARK_AQUA;
-                    case '\u00A7' + "4" -> Colors.DARK_RED;
-                    case '\u00A7' + "5" -> Colors.DARK_PURPLE;
-                    case '\u00A7' + "6" -> Colors.GOLD;
-                    case '\u00A7' + "7" -> Colors.GREY;
-                    case '\u00A7' + "8" -> Colors.DARK_GREY;
-                    case '\u00A7' + "9" -> Colors.BLUE;
-                    case '\u00A7' + "a" -> Colors.GREEN;
-                    case '\u00A7' + "b" -> Colors.AQUA;
-                    case '\u00A7' + "c" -> Colors.RED;
-                    case '\u00A7' + "d" -> Colors.LIGHT_PURPLE;
-                    case '\u00A7' + "e" -> Colors.YELLOW;
-                    case '\u00A7' + "f" -> Colors.WHITE;
-                    case '\u00A7' + "k" -> Colors.OBFUSCATE;
-                    case '\u00A7' + "l" -> Colors.BOLD;
-                    case '\u00A7' + "m" -> Colors.STRIKETHROUGH;
-                    case '\u00A7' + "n" -> Colors.UNDERLINE;
-                    case '\u00A7' + "o" -> Colors.ITALIC;
-                    default -> Colors.RESET;
-                };
+                switch (colorChar) {
+                    case '\u00A7' + "0":
+                        return Colors.BLACK;
+                    case '\u00A7' + "1":
+                        return Colors.DARK_BLUE;
+                    case '\u00A7' + "2":
+                        return Colors.DARK_GREEN;
+                    case '\u00A7' + "3":
+                        return Colors.DARK_AQUA;
+                    case '\u00A7' + "4":
+                        return Colors.DARK_RED;
+                    case '\u00A7' + "5":
+                        return Colors.DARK_PURPLE;
+                    case '\u00A7' + "6":
+                        return Colors.GOLD;
+                    case '\u00A7' + "7":
+                        return Colors.GREY;
+                    case '\u00A7' + "8":
+                        return Colors.DARK_GREY;
+                    case '\u00A7' + "9":
+                        return Colors.BLUE;
+                    case '\u00A7' + "a":
+                        return Colors.GREEN;
+                    case '\u00A7' + "b":
+                        return Colors.AQUA;
+                    case '\u00A7' + "c":
+                        return Colors.RED;
+                    case '\u00A7' + "d":
+                        return Colors.LIGHT_PURPLE;
+                    case '\u00A7' + "e":
+                        return Colors.YELLOW;
+                    case '\u00A7' + "f":
+                        return Colors.WHITE;
+                    case '\u00A7' + "k":
+                        return Colors.OBFUSCATE;
+                    case '\u00A7' + "l":
+                        return Colors.BOLD;
+                    case '\u00A7' + "m":
+                        return Colors.STRIKETHROUGH;
+                    case '\u00A7' + "n":
+                        return Colors.UNDERLINE;
+                    case '\u00A7' + "o":
+                        return Colors.ITALIC;
+                    default:
+                        return Colors.RESET;
+                }
             }
 
             public static String colorize(String mcText) {
@@ -242,13 +265,13 @@ public class ColorUtils {
                     tryAgain = true;
                 }
 
-                String[] magicCodes = Pattern.compile("(?i)" + '\u00A7' +"x[A-F0-9" + '\u00A7' +"]{12}").matcher(mcText).results().map(MatchResult::group).toArray(String[]::new);
+                String[] magicCodes = MatchingUtils.results(Pattern.compile("(?i)" + '\u00A7' +"x[A-F0-9" + '\u00A7' +"]{12}").matcher(mcText)).map(MatchResult::group).toArray(String[]::new);
                 for (String magicCode : magicCodes) {
                     Color color = Color.decode("#" + magicCode.substring(2).replaceAll("\u00A7", ""));
                     mcText = mcText.replaceAll(Pattern.quote(magicCode), Matcher.quoteReplacement(Ansi.generateCode(Attribute.TEXT_COLOR(color.getRed(), color.getGreen(), color.getBlue()))));
                 }
 
-                String[] matches = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]").matcher(mcText).results().map(MatchResult::group).toArray(String[]::new);
+                String[] matches = MatchingUtils.results(Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]").matcher(mcText)).map(MatchResult::group).toArray(String[]::new);
                 for (String match : matches) {
                     mcText = mcText.replaceAll(Pattern.quote(match), Matcher.quoteReplacement(Ansi.generateCode(Colors.getColor(match).getAttribute())));
                 }
@@ -263,13 +286,13 @@ public class ColorUtils {
                     tryAgain = true;
                 }
 
-                String[] magicCodes = Pattern.compile("(?i)" + '\u00A7' +"x[A-F0-9" + '\u00A7' +"]{12}").matcher(mcText).results().map(MatchResult::group).toArray(String[]::new);
+                String[] magicCodes = MatchingUtils.results(Pattern.compile("(?i)" + '\u00A7' +"x[A-F0-9" + '\u00A7' +"]{12}").matcher(mcText)).map(MatchResult::group).toArray(String[]::new);
                 for (String magicCode : magicCodes) {
                     Color color = Color.decode("#" + magicCode.substring(2).replaceAll("\u00A7", ""));
                     mcText = mcText.replaceAll(Pattern.quote(magicCode), Matcher.quoteReplacement(Ansi.generateCode(Attribute.TEXT_COLOR(color.getRed(), color.getGreen(), color.getBlue()))));
                 }
 
-                String[] matches = Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]").matcher(mcText).results().map(MatchResult::group).toArray(String[]::new);
+                String[] matches = MatchingUtils.results(Pattern.compile("(?i)" + '\u00A7' + "[0-9A-FK-ORX]").matcher(mcText)).map(MatchResult::group).toArray(String[]::new);
                 for (String match : matches) {
                     mcText = mcText.replaceAll(Pattern.quote(match), Matcher.quoteReplacement(Ansi.generateCode(Colors.getColor(match).getAttribute())));
                 }
