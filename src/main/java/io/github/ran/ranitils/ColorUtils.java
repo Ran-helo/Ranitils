@@ -99,12 +99,12 @@ public class ColorUtils {
      */
     public static Color getChromaColor(double x, double y, double offsetScale) {
         float v = 2000.0f;
-        return new Color(Color.HSBtoRGB((float)((System.currentTimeMillis() - x * 10.0 * offsetScale - y * 10.0 * offsetScale) % v) / v, 0.8f, 0.8f));
+        return new Color(Color.HSBtoRGB((float)((System.currentTimeMillis() - x * 10.0 * offsetScale - y * 10.0 * offsetScale) % v) / v, 0.8f, 1f));
     }
 
     public static class AnsiColorUtils {
         /**
-         * Enables ansi codes on windows.
+         * Enables ansi codes on Windows.
          */
         public static void enableAnsiOnWindows() {
             Function GetStdHandleFunc = Function.getFunction("kernel32", "GetStdHandle");
@@ -153,7 +153,7 @@ public class ColorUtils {
         /**
          * Replaces minecraft color codes with ansi codes.
          * @param mcText The text to color.
-         * @param legacy Set this to true if you're using a version of Minecraft that doesn't support RGB color codes.
+         * @param legacy Set this to true if you're using a version of Minecraft that doesn't support RGB color codes or if you don't want to use RGB colors in general.
          * @return String that's colored with ansi codes.
          */
         public static String minecraftColorToAnsi(String mcText, boolean legacy) {
@@ -190,7 +190,7 @@ public class ColorUtils {
             BOLD('\u00A7' + "l", Attribute.BOLD()),
             UNDERLINE('\u00A7' + "n", Attribute.UNDERLINE()),
             RESET('\u00A7' + "r", Attribute.CLEAR()),
-            OBFUSCATE('\u00A7' + "k", Attribute.REVERSE()); // I don't know how to do this
+            OBFUSCATE('\u00A7' + "k", Attribute.REVERSE()); // I don't know what this code format's ansi code would be
 
             private final String colorCode;
             private final Attribute attribute;
