@@ -24,6 +24,7 @@ shadowJar {
 
     relocate 'net.kyori', 'io.github.ran.ranitils.shaded.net.kyori'
     relocate 'com.diogonunes', 'io.github.ran.ranitils.shaded.com.diogonunes'
+    relocate 'javassist', 'io.github.ran.ranitils.shaded.javassist'
 
     mergeServiceFiles()
 }
