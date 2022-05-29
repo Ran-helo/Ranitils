@@ -43,16 +43,22 @@ public class TransformationUtils {
     private String pathToClassInsideJAR;
     private CtClass cc;
     private boolean loaded = false;
+    private ClassPool pool;
 
     protected void setPathToJAR(String pathToJAR) {
         this.pathToJAR = pathToJAR;
     }
 
-    protected CtClass makeClass(String className, boolean isInterface) {
+    protected CtClass makeClass(String className, boolean isInterface, @Nullable String... imports) {
         loaded = true;
         className = className.replace("\\", ".").replace("/", ".");
         if (className.endsWith(".class")) className = className.substring(0, className.length() - 6);
-        ClassPool pool = ClassPool.getDefault();
+        pool = ClassPool.getDefault();
+        if (imports != null) {
+            for (String imp : imports) {
+                pool.importPackage(imp);
+            }
+        }
         if (isInterface) return cc = pool.makeInterface(className);
         return cc = pool.makeClass(className);
     }
@@ -80,15 +86,20 @@ public class TransformationUtils {
         return cc.getModifiers();
     }
 
-    protected CtClass loadClass(String className) throws NotFoundException {
+    protected CtClass loadClass(String className, @Nullable String... imports) throws NotFoundException {
         loaded = true;
         className = className.replace("\\", ".").replace("/", ".");
         if (className.endsWith(".class")) className = className.substring(0, className.length() - 6);
-        ClassPool pool = ClassPool.getDefault();
+        pool = ClassPool.getDefault();
+        if (imports != null) {
+            for (String imp : imports) {
+                pool.importPackage(imp);
+            }
+        }
         return cc = pool.get(className);
     }
 
-    protected CtClass setPathToClassInsideJAR(String pathToClassInsideJAR) throws IOException {
+    protected CtClass setPathToClassInsideJAR(String pathToClassInsideJAR, @Nullable String... imports) throws IOException {
         loaded = false;
         this.pathToClassInsideJAR = pathToClassInsideJAR;
         if (!pathToClassInsideJAR.endsWith(".class")) this.pathToClassInsideJAR = pathToClassInsideJAR.replace(".", "/") + ".class";
@@ -100,7 +111,12 @@ public class TransformationUtils {
         }
         InputStream fis = jarFile.getInputStream(zipEntry);
 
-        ClassPool pool = ClassPool.getDefault();
+        pool = ClassPool.getDefault();
+        if (imports != null) {
+            for (String imp : imports) {
+                pool.importPackage(imp);
+            }
+        }
         cc = pool.makeClass(fis);
         fis.close();
         jarFile.close();
