@@ -48,12 +48,21 @@ public class TransformationUtils {
     protected void setPathToJAR(String pathToJAR) {
         this.pathToJAR = pathToJAR;
     }
+    
+    protected void setPool(ClassPool pool) {
+        this.pool = pool;
+    }
+    
+    protected ClassPool getPool() {
+        if (pool == null) pool = ClassPool.getDefault();
+        return pool;
+    }
 
     protected CtClass makeClass(String className, boolean isInterface, @Nullable String... imports) {
         loaded = true;
         className = className.replace("\\", ".").replace("/", ".");
         if (className.endsWith(".class")) className = className.substring(0, className.length() - 6);
-        pool = ClassPool.getDefault();
+        if (pool == null) pool = ClassPool.getDefault();
         if (imports != null) {
             for (String imp : imports) {
                 pool.importPackage(imp);
@@ -90,7 +99,7 @@ public class TransformationUtils {
         loaded = true;
         className = className.replace("\\", ".").replace("/", ".");
         if (className.endsWith(".class")) className = className.substring(0, className.length() - 6);
-        pool = ClassPool.getDefault();
+        if (pool == null) pool = ClassPool.getDefault();
         if (imports != null) {
             for (String imp : imports) {
                 pool.importPackage(imp);
@@ -111,7 +120,7 @@ public class TransformationUtils {
         }
         InputStream fis = jarFile.getInputStream(zipEntry);
 
-        pool = ClassPool.getDefault();
+        if (pool == null) pool = ClassPool.getDefault();
         if (imports != null) {
             for (String imp : imports) {
                 pool.importPackage(imp);
