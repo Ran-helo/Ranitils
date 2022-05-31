@@ -58,6 +58,10 @@ public class TransformationUtils {
         return pool;
     }
 
+    protected CtClass setClassToWorkWith(CtClass cc) {
+        return this.cc = cc;
+    }
+
     protected CtClass makeClass(String className, boolean isInterface, @Nullable String... imports) {
         loaded = true;
         className = className.replace("\\", ".").replace("/", ".");
